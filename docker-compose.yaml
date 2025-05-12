@@ -1,0 +1,76 @@
+services:
+  frontend:
+    build: ./frontend
+    restart: always
+    ports:
+      - 3005:8080
+    environment:
+      - REACT_APP_API_URL=http://localhost:8080
+
+  node-1:
+    image: signer-node
+    build: ./node
+    networks:
+      - node_net
+    depends_on:
+      - bootstrap_node
+    environment:
+      - PRIVATE_KEY=2effe08877742d1b5f37ffbef652521ab47f051544044f283497228c0cf8adb5
+      - BOOTSTRAP_NODE=/ip4/172.30.0.3/tcp/4001/p2p/16Uiu2HAkw8bNkmfyxhXCiuW3VkSRGij2mN3e4wZkwULxvV6js5xB
+      - TOPIC=oracle-0
+    restart: always
+
+  node-2:
+    image: signer-node
+    networks:
+      - node_net
+    depends_on:
+      - node-1
+      - bootstrap_node
+    environment:
+      - PRIVATE_KEY=85e3c004c40a116e25f0fa592f7df51ddd7ce4142474d3f0e3b0204714c2bfbf
+      - BOOTSTRAP_NODE=/ip4/172.30.0.3/tcp/4001/p2p/16Uiu2HAkw8bNkmfyxhXCiuW3VkSRGij2mN3e4wZkwULxvV6js5xB
+      - TOPIC=oracle-0
+    restart: always
+
+  node-3:
+    image: signer-node
+    networks:
+      - node_net
+    depends_on:
+      - node-1
+      - bootstrap_node
+    environment:
+      - PRIVATE_KEY=1717fae54cdc6571fc2eb49b40f17878393f8781f019145a4c4d5e12eb3d0acb
+      - BOOTSTRAP_NODE=/ip4/172.30.0.3/tcp/4001/p2p/16Uiu2HAkw8bNkmfyxhXCiuW3VkSRGij2mN3e4wZkwULxvV6js5xB
+      - TOPIC=oracle-0
+    restart: always
+
+  bootstrap_node:
+    build: ./bootstrap
+    volumes:
+      - bootstrap-data:/app/data
+    ports:
+      - "4001:4001"
+      - "8080:8080"
+    networks:
+      node_net:
+        ipv4_address: 172.30.0.3
+    environment:
+      - PRIVATE_KEY=2717fae54cdc6571fc2eb49b40f17878393f8781f019145a4c4d5e12eb3d0aca
+      - TICKERS=SBER
+      - STRUCTURE_ID=stock_quote
+      - DATA_COLLECTION_INTERVAL=30
+      - TOPIC=oracle-0
+      - TRUSTED_ADDRESSES=0x281a56D355eeD275a09Cad4BeaE9b43dA42A7D7b,0xCE4Fb20eeE6269a9F4CFBBf82d8E4FB58E9aBC6B,0x0B872b104A9E8D9c2687318742314d30Bad5Ff63
+    restart: always
+
+networks:
+  node_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
+
+volumes:
+  bootstrap-data:

@@ -1,0 +1,11 @@
+{
+  "stock_quote": {
+    "fields": [
+      {"name": "ticker", "solidity_type": "string", "description": "Stock ticker symbol"},
+      {"name": "price", "solidity_type": "uint256", "description": "Price in scaled units 10^6"},
+      {"name": "destination_chain_id", "solidity_type": "uint256", "description": "Target blockchain ID"},
+      {"name": "timestamp", "solidity_type": "uint256", "description": "Unix timestamp"}
+    ],
+    "required_fields": ["ticker", "price", "timestamp"]
+  }
+}
